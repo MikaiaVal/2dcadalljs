@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2DjsCAD by Mikaiaval</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <!-- Floating Top menu with all tool and action icons -->
+    <div id="topBar" class="flex items-center gap-1 p-2 rounded-lg shadow-md">
+        <!-- Select/Move Tool -->
+        <button id="selectTool" title="Select Tool (V)" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-indigo-500 text-white shadow-lg hover:bg-indigo-600 focus:outline-none transition-colors duration-200 active-tool" aria-label="Select Tool">
+            <i class="fas fa-mouse-pointer"></i>
+        </button>
+
+        <!-- Drawing Tools Dropdown -->
+        <div class="dropdown">
+            <button id="drawToolsButton" title="Drawing Tools" class="w-9 h-9 flex items-center justify-center font-semibold text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Drawing Tools">
+                <span id="activeDrawToolIcon">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 20L10 10L16 16L20 8"></path>
+                    </svg>
+                </span>
+            </button>
+            <div id="drawToolsDropdown" class="dropdown-content">
+                <button id="lineTool" title="Line Tool (L)" data-tool="line" class="w-full h-9 flex items-center justify-center font-semibold text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Line Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 20L10 10L16 16L20 8"></path>
+                    </svg>
+                </button>
+                <button id="rectangleTool" title="Rectangle Tool (R)" data-tool="rectangle" class="w-full h-9 flex items-center justify-center font-semibold text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Rectangle Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="4" width="18" height="16" rx="2"></rect>
+                        <circle cx="4.5" cy="4" r="2" fill="currentColor"></circle>
+                    </svg>
+                </button>
+                <button id="circleTool" title="Circle Tool (C)" data-tool="circle" class="w-full h-9 flex items-center justify-center font-semibold text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Circle Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+                    </svg>
+                </button>                
+                <button id="arcTool" title="Arc Tool (A)" data-tool="arc" class="w-full h-9 flex items-center justify-center font-semibold text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Arc Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 16A8 8 0 0 1 20 16"></path>
+                        <circle cx="4" cy="16" r="1.5" fill="currentColor"></circle>
+                        <circle cx="20" cy="16" r="1.5" fill="currentColor"></circle>
+                        <circle cx="12" cy="8" r="1.5" fill="currentColor"></circle>
+                    </svg>
+                </button>
+                <button id="ellipseTool" title="Ellipse Tool" data-tool="ellipse" class="w-full h-9 flex items-center justify-center font-semibold text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Ellipse Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <ellipse cx="12" cy="12" rx="10" ry="6"></ellipse>
+                    </svg>
+                </button>
+                <button id="splineTool" title="Spline Tool" data-tool="spline" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Spline Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4c5 0 5 16 16 16"></path>
+                    </svg>
+                </button>                
+                <button id="polygonTool" title="Polygon Tool" data-tool="polygon" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Polygon Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8.66 5v10l-8.66 5-8.66-5V7l8.66-5z"></path></svg>
+                </button>
+                <button id="slotTool" title="Slot Tool" data-tool="slot" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Slot Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="8" width="16" height="8" rx="4" ry="4"></rect>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Smart Dimension Tool -->
+        <button id="dimensionTool" title="Dimension Tool (D)" data-tool="dimension" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Dimension Tool">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20L20 4" />
+                <path d="M16 4h4v4" />
+                <path d="M4 16v4h4" />
+            </svg>
+        </button>
+
+        <!-- Text Tool -->
+        <button id="textTool" title="Text Tool" data-tool="text" class="w-9 h-9 flex items-center justify-center text-lg font-bold rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Text Tool">
+            A
+        </button>
+        
+        <!-- Constraint Tools Dropdown -->
+        <div class="dropdown">
+            <button id="constraintToolsButton" title="Constraint Tools" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Constraint Tools">
+                 <span id="activeConstraintToolIcon">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 19L19 5"></path>
+                        <path d="M13 5L19 11"></path>
+                        <circle cx="13" cy="11" r="1.5" fill="currentColor"></circle>
+                    </svg>
+                 </span>
+            </button>
+            <div id="constraintToolsDropdown" class="dropdown-content">
+                <button id="coincidentConstraintTool" title="Coincident Constraint" data-tool="coincidentConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Coincident Constraint Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 19L19 5" />
+                        <path d="M13 5L19 11" />
+                        <circle cx="13" cy="11" r="1.5" fill="currentColor" />
+                    </svg>
+                </button>
+                <button id="tangentConstraintTool" title="Tangent Constraint" data-tool="tangentConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Tangent Constraint Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="6" cy="9" r="5.5"></circle>
+                        <path d="M4 20L12.5 11.5"></path>
+                    </svg>
+                </button>
+                <button id="fixConstraintTool" title="Fix Constraint" data-tool="fixConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Fix Constraint Tool">
+                    <i class="fas fa-anchor"></i>
+                </button>
+                <button id="horizontalConstraintTool" title="Horizontal Constraint" data-tool="horizontalConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Horizontal Constraint Tool">
+                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5"></path></svg>
+                </button>
+                <button id="verticalConstraintTool" title="Vertical Constraint" data-tool="verticalConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Vertical Constraint Tool">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5"></path></svg>
+                </button>
+                <button id="parallelConstraintTool" title="Parallel Constraint" data-tool="parallelConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Parallel Constraint Tool">
+                    <svg class="w-5 h-5 transform -rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5M19 7H5"></path></svg>
+                </button>
+                <button id="perpendicularConstraintTool" title="Perpendicular Constraint" data-tool="perpendicularConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Perpendicular Constraint Tool">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v14M6 18h12"></path></svg>
+                </button>
+                <button id="collinearConstraintTool" title="Collinear Constraint" data-tool="collinearConstraint" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Collinear Constraint Tool">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 20L9.5 14.5"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.5 12.5L12.5 11.5"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.5 9.5L20 4"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modify Tools Dropdown -->
+        <div class="dropdown">
+            <button id="modifyToolsButton" title="Modify Tools" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Modify Tools">
+                <span id="activeModifyToolIcon"><i class="fas fa-cut"></i></span>
+            </button>
+            <div id="modifyToolsDropdown" class="dropdown-content">
+                <button id="trimTool" title="Trim Tool" data-tool="trim" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Trim Tool">
+                    <i class="fas fa-cut"></i>
+                </button>
+                <button id="offsetTool" title="Offset Tool" data-tool="offset" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Offset Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                    </svg>
+                </button>
+                <button id="filletTool" title="Fillet Tool" data-tool="fillet" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Fillet Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20H8C5.79086 20 4 18.2091 4 16V4"></path>
+                    </svg>
+                </button>
+                <button id="chamferTool" title="Chamfer Tool" data-tool="chamfer" class="w-full h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Chamfer Tool">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 20H10L4 14V4"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Action buttons with icons -->
+        <button id="deleteButton" title="Delete (Del)" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Delete">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+        <button id="undoButton" title="Undo (Ctrl+Z)" class="w-9 h-9 flex items-center justify-center rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200 disabled:opacity-50" disabled aria-label="Undo">
+            <i class="fas fa-undo"></i>
+        </button>
+        <button id="redoButton" title="Redo (Ctrl+Y)" class="w-9 h-9 flex items-center justify-center rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200 disabled:opacity-50" disabled aria-label="Redo">
+            <i class="fas fa-redo"></i>
+        </button>
+        <!-- Zoom to Fit Button -->
+        <button id="zoomFitButton" title="Zoom to Fit" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Zoom to Fit">
+            <i class="fas fa-compress-arrows-alt"></i>
+        </button>
+        <button id="gridButton" title="Toggle Grid" class="w-9 h-9 flex items-center justify-center rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Toggle Grid">
+            <i class="fas fa-th"></i>
+        </button>
+        <button id="borderToolButton" title="Add Template Border" class="w-9 h-9 flex items-center justify-center text-lg rounded-md bg-gray-200 text-gray-800 shadow-lg hover:bg-gray-300 focus:outline-none transition-colors duration-200" aria-label="Add Template Border">
+            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <rect x="7" y="7" width="10" height="10" rx="1"></rect>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Main content area for the canvas -->
+    <main id="canvas-container" class="fixed inset-0 bg-gray-300">
+        <canvas id="myCanvas" class="w-full h-full"></canvas>
+    </main> 
+
+    <!-- Modal for selecting paper size at startup -->
+<div id="paperSizeModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-2xl w-full max-w-sm">
+        <h3 class="text-xl font-bold mb-4">Select Paper Size</h3>
+        <div class="space-y-4">
+            <div>
+                <label for="paperSizeSelect" class="block text-sm font-medium text-gray-700">Format</label>
+                <select id="paperSizeSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="A4">A4 (210 x 297 mm)</option>
+                    <option value="A3">A3 (297 x 420 mm)</option>
+                    <option value="A2">A2 (420 x 594 mm)</option>
+                    <option value="A1">A1 (594 x 841 mm)</option>
+                    <option value="A5">A5 (148 x 210 mm)</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div id="customSizeInputs" class="hidden space-y-4">
+                <div>
+                    <label for="customWidthInput" class="block text-sm font-medium text-gray-700">Width (mm)</label>
+                    <input type="number" id="customWidthInput" value="210" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label for="customHeightInput" class="block text-sm font-medium text-gray-700">Height (mm)</label>
+                    <input type="number" id="customHeightInput" value="297" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+            </div>
+             <div class="flex items-center">
+                <input id="landscapeCheckbox" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" checked>
+                <label for="landscapeCheckbox" class="ml-2 block text-sm text-gray-900">Landscape</label>
+            </div>
+        </div>
+        <div class="mt-6">
+            <button id="startDrawingButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Start Drawing
+            </button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal for Offset Template Border -->
+    <div id="offsetTemplateModal" class="modal">
+        <h3 class="text-lg font-bold mb-4">Add Template Border</h3>
+        <div class="modal-content">
+            <div class="mb-4">
+                <label for="offsetValueInput" class="block text-sm font-medium text-gray-700 mb-1">Offset (mm)</label>
+                <input type="number" id="offsetValueInput" value="10" />
+            </div>
+            <div>
+                <label for="borderThicknessInput" class="block text-sm font-medium text-gray-700 mb-1">Thickness (px)</label>
+                <input type="number" id="borderThicknessInput" value="2" />
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="cancelOffsetButton" class="modal-button cancel">Cancel</button>
+            <button id="okOffsetButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Modal for Template Border -->
+    <div id="borderModal" class="modal">
+        <h3 class="text-lg font-bold mb-4">Add Template Border</h3>
+        <div class="modal-content">
+            <div class="mb-4">
+                <label for="borderOffsetInput" class="block text-sm font-medium text-gray-700 mb-1">Offset (mm)</label>
+                <input type="number" id="borderOffsetInput" value="5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+            <div>
+                <label for="borderThicknessInput" class="block text-sm font-medium text-gray-700 mb-1">Thickness (px)</label>
+                <input type="number" id="borderThicknessInput" value="0.5" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="cancelBorderButton" class="modal-button cancel">Cancel</button>
+            <button id="okBorderButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Modal for Polygon Sides -->
+    <div id="polygonSidesModal" class="modal">
+        <h3 class="text-lg font-bold mb-4">Polygon Sides</h3>
+        <div class="modal-content">
+            <label for="polygonSidesInput" class="block text-sm font-medium text-gray-700 mb-1">Number of Sides (3-16)</label>
+            <input type="number" id="polygonSidesInput" value="6" min="3" max="16" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+            <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700">Type</label>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input id="inscribedRadio" name="polygon-type" type="radio" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                        <label for="inscribedRadio" class="ml-3 block text-sm font-medium text-gray-700">Inscribed</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="circumscribedRadio" name="polygon-type" type="radio" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                        <label for="circumscribedRadio" class="ml-3 block text-sm font-medium text-gray-700">Circumscribed</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="cancelPolygonSidesButton" class="modal-button cancel">Cancel</button>
+            <button id="okPolygonSidesButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Modal for Text Tool -->
+    <div id="textToolModal" class="modal">
+        <h3 class="text-lg font-bold mb-4">Text Properties</h3>
+        <div class="modal-content space-y-3">
+            <div>
+                <label for="textContentInput" class="block text-sm font-medium text-gray-700">Text</label>
+                <textarea id="textContentInput" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="fontSizeInput" class="block text-sm font-medium text-gray-700">Size (px)</label>
+                    <input type="number" id="fontSizeInput" value="24" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" />
+                </div>
+                <div>
+                    <label for="fontColorInput" class="block text-sm font-medium text-gray-700">Color</label>
+                    <input type="color" id="fontColorInput" value="#000000" class="mt-1 block w-full h-10 rounded-md border-gray-300 shadow-sm" />
+                </div>
+            </div>
+            <div>
+                <label for="fontFamilySelect" class="block text-sm font-medium text-gray-700">Font</label>
+                <select id="fontFamilySelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option>Arial</option>
+                    <option>Verdana</option>
+                    <option>Times New Roman</option>
+                    <option>Courier New</option>
+                    <option>Georgia</option>
+                </select>
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="block text-sm font-medium text-gray-700">Style</label>
+                <div class="flex items-center space-x-2">
+                    <button id="fontBoldButton" class="px-3 py-1 border border-gray-300 rounded-md text-sm font-bold">B</button>
+                    <button id="fontItalicButton" class="px-3 py-1 border border-gray-300 rounded-md text-sm italic">I</button>
+                    <button id="fontUnderlineButton" class="px-3 py-1 border border-gray-300 rounded-md text-sm underline">U</button>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <label class="block text-sm font-medium text-gray-700">Alignment</label>
+                <div class="flex items-center space-x-2">
+                    <button id="textAlignLeftButton" data-align="left" class="p-2 border border-gray-300 rounded-md active-tool"><i class="fas fa-align-left"></i></button>
+                    <button id="textAlignCenterButton" data-align="center" class="p-2 border border-gray-300 rounded-md"><i class="fas fa-align-center"></i></button>
+                    <button id="textAlignRightButton" data-align="right" class="p-2 border border-gray-300 rounded-md"><i class="fas fa-align-right"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="cancelTextButton" class="modal-button cancel">Cancel</button>
+            <button id="okTextButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Custom Context Menu for the line tool -->
+    <div id="customContextMenu">
+        <div id="endLinesMenuItem" class="context-menu-item">End Drawing</div>
+        <div id="deleteMenuItem" class="context-menu-item danger">Delete</div>
+    </div>
+
+    <!-- Modal for editing dimensions -->
+    <div id="editDimensionModal" class="modal">
+        <h3>Edit Dimension</h3>
+        <div class="modal-content">
+            <label for="dimensionValueInput" id="dimensionLabel">New Value</label>
+            <input type="text" id="dimensionValueInput" />
+        </div>
+        <div class="button-group">
+            <button id="cancelEditButton" class="modal-button cancel">Cancel</button>
+            <button id="okEditButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+
+    <!-- Modal for modifier tools -->
+    <div id="modifierModal" class="modal">
+        <h3 id="modifierModalTitle" class="text-lg font-bold mb-2">Modifier</h3>
+        <div class="modal-content">
+            <!-- Common Value Input -->
+            <div>
+                <label for="modifierValueInput" id="modifierLabel">Value</label>
+                <input type="text" id="modifierValueInput" />
+            </div>
+            <!-- Offset Specific -->
+            <div id="offsetOptions" class="mt-2" style="display: none;">
+                 <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" id="inverseOffsetCheckbox" class="w-auto" />
+                    <span>Inverse Direction</span>
+                </label>
+            </div>
+            <!-- Chamfer Specific -->
+            <div id="chamferOptions" class="mt-2" style="display: none;">
+                <label for="chamferAngleInput">Angle (deg)</label>
+                <input type="text" id="chamferAngleInput" value="45" />
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="cancelModifierButton" class="modal-button cancel">Cancel</button>
+            <button id="okModifierButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+    
+    <!-- Draggable Shape Inspector Panel -->
+    <div id="shapeInspectorPanel" class="modal">
+        <div id="inspectorHeader">Shape Inspector</div>
+        <div class="modal-content">
+            <div class="inspector-row">
+                <label for="lineColorInput">Line Color</label>
+                <input type="color" id="lineColorInput" />
+            </div>
+            <div class="inspector-row">
+                <label for="lineWidthInput">Thickness (px)</label>
+                <input type="number" id="lineWidthInput" min="1" max="20" />
+            </div>
+            <div class="inspector-row">
+                <label for="lineTypeSelect">Line Type</label>
+                <select id="lineTypeSelect">
+                    <option value="solid">Solid</option>
+                    <option value="dashed">Dashed</option>
+                    <option value="construction">Construction</option>
+                </select>
+            </div>
+        </div>
+        <div class="button-group">
+            <button id="inspectorCancelButton" class="modal-button cancel">Cancel</button>
+            <button id="inspectorOkButton" class="modal-button ok">OK</button>
+        </div>
+    </div>
+    
+    <!-- Load modularized scripts -->
+    <script src="src/utilities.js"></script>
+    <script src="src/geometry.js"></script>
+    <script src="src/dimensions.js"></script>
+    <script src="src/modifier.js"></script>
+    <script src="src/constraint.js"></script>
+    <!-- Main application script -->
+    <script src="src/main.js"></script>
+
+</body>
+</html>
